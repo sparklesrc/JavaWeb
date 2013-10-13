@@ -27,8 +27,8 @@ public class LocalDAO extends BaseDAO {
      UPDATE - UPDATE
      DELETE - DELETE
      */
-    public Collection<Local> listar() throws ExcepcionDAO {
-        Collection<Local> c = new ArrayList<Local>();
+    public List<Local> list() throws ExcepcionDAO {
+        List<Local> c = new ArrayList<Local>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
