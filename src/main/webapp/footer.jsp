@@ -6,3 +6,6 @@
 <script src="public/bootstrap/css/bootstrap.min.css" type="text/javascript"></script>
 
 <!-- Este es un comentario -->
+<!-- Este es un comentario -->
+<!-- Este es un comentario -->
+<!-- Este es un comentario -->
