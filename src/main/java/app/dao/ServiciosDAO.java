@@ -1,6 +1,6 @@
 package app.dao;
 
-import app.model.Categoria;
+import app.model.Servicio;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,10 +15,10 @@ import app.zelper.ConexionDB;
  */
 public class ServiciosDAO extends BaseDAO {
 
-    public Collection<Categoria> buscarPorNombre(String nombre)
+    public Collection<Servicio> buscarPorNombre(String nombre)
             throws ExcepcionDAO {
-        String query = "select id_categoria, nombre, descripcion from categoria where nombre like ?";
-        Collection<Categoria> lista = new ArrayList<Categoria>();
+        String query = "select id, descripcion, costo_hora from servicio where descripcion like ?";
+        Collection<Servicio> lista = new ArrayList<Servicio>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -28,10 +28,10 @@ public class ServiciosDAO extends BaseDAO {
             stmt.setString(1, "%" + nombre + "%");
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Categoria item = new Categoria();
-                item.setIdCategoria(rs.getInt("id_categoria"));
-                item.setNombre(rs.getString("nombre"));
+                Servicio item = new Servicio();
+                item.setId(rs.getInt("id"));
                 item.setDescripcion(rs.getString("descripcion"));
+                item.setCostoHora(rs.getDouble("costo_hora"));
                 lista.add(item);
             }
         } catch (SQLException e) {
@@ -46,16 +46,16 @@ public class ServiciosDAO extends BaseDAO {
         return lista;
     }
 
-    public Categoria insertar(Categoria categoria) throws ExcepcionDAO {
-        String query = "insert into categoria(nombre,descripcion) values (?,?)";
+    public Servicio insertar(Servicio servicio) throws ExcepcionDAO {
+        String query = "insert into servicio(descripcion, costo_hora) values (?,?)";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, categoria.getNombre());
-            stmt.setString(2, categoria.getDescripcion());
+            stmt.setString(1, servicio.getDescripcion());
+            stmt.setDouble(2, servicio.getCostoHora());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo insertar");
