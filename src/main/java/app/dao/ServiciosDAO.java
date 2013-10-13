@@ -68,7 +68,7 @@ public class ServiciosDAO extends BaseDAO {
             if (rs.next()) {
                 id = rs.getInt(1);
             }
-            categoria.setIdCategoria(id);
+            servicio.setId(id);
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -78,24 +78,24 @@ public class ServiciosDAO extends BaseDAO {
             this.cerrarStatement(stmt);
             this.cerrarConexion(con);
         }
-        return categoria;
+        return servicio;
     }
 
-    public Categoria obtener(int idCategoria) throws ExcepcionDAO {
-        Categoria item = new Categoria();
+    public Servicio obtener(int idServicio) throws ExcepcionDAO {
+        Servicio item = new Servicio();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            String query = "select id_categoria, nombre, descripcion from categoria where id_categoria=?";
+            String query = "select id, descripcion, costo_hora from servicio where id=?";
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, idCategoria);
+            stmt.setInt(1, idServicio);
             rs = stmt.executeQuery();
             if (rs.next()) {
-                item.setIdCategoria(rs.getInt(1));
-                item.setNombre(rs.getString(2));
-                item.setDescripcion(rs.getString(3));
+                item.setId(rs.getInt(1));
+                item.setDescripcion(rs.getString(2));
+                item.setCostoHora(rs.getDouble(3));
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -129,16 +129,15 @@ public class ServiciosDAO extends BaseDAO {
         }
     }
 
-    public Categoria actualizar(Categoria item) throws ExcepcionDAO {
-        String query = "update categoria set nombre=?,descripcion=? where id_categoria=?";
+    public Servicio actualizar(Servicio item) throws ExcepcionDAO {
+        String query = "update servicio set descripcion=?, costo_hora=? where id=?";
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, item.getNombre());
-            stmt.setString(2, item.getDescripcion());
-            stmt.setInt(3, item.getIdCategoria());
+            stmt.setString(1, item.getDescripcion());
+            stmt.setDouble(2, item.getCostoHora());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo actualizar");
@@ -153,21 +152,21 @@ public class ServiciosDAO extends BaseDAO {
         return item;
     }
 
-    public Collection<Categoria> listar() throws ExcepcionDAO {
-        Collection<Categoria> c = new ArrayList<Categoria>();
+    public Collection<Servicio> listar() throws ExcepcionDAO {
+        Collection<Servicio> c = new ArrayList<Servicio>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
-            String query = "select id_categoria,nombre,descripcion from categoria order by nombre";
+            String query = "select id,descripcion,costo_hora from servicio order by descripcion";
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Categoria item = new Categoria();
-                item.setIdCategoria(rs.getInt("id_categoria"));
-                item.setNombre(rs.getString("nombre"));
+                Servicio item = new Servicio();
+                item.setId(rs.getInt("id"));
                 item.setDescripcion(rs.getString("descripcion"));
+                item.setCostoHora(rs.getDouble("costo_hora"));
                 c.add(item);
             }
 

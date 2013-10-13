@@ -14,6 +14,14 @@ public class Servicio {
     private String descripcion;
     private double costoHora;
 
+    public Servicio() {
+        this.id = 0;
+        this.descripcion = "";
+        this.costoHora = 0.00;
+    }
+
+    
+    
     public long getId() {
         return id;
     }
