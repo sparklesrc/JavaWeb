@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.model;
 
 import java.util.Date;
@@ -13,8 +9,8 @@ import java.util.Date;
 public class SolicitudAlquiler {
     
     private long id;
-    private Date horaInicio;
-    private Date horaFin;
+    private String horaInicio;
+    private String horaFin;
     private Date dia;
     private String servicios;
     private int estado;
@@ -29,19 +25,19 @@ public class SolicitudAlquiler {
         this.id = id;
     }
 
-    public Date getHoraInicio() {
+    public String getHoraInicio() {
         return horaInicio;
     }
 
-    public void setHoraInicio(Date horaInicio) {
+    public void setHoraInicio(String horaInicio) {
         this.horaInicio = horaInicio;
     }
 
-    public Date getHoraFin() {
+    public String getHoraFin() {
         return horaFin;
     }
 
-    public void setHoraFin(Date horaFin) {
+    public void setHoraFin(String horaFin) {
         this.horaFin = horaFin;
     }
 
