@@ -9,8 +9,7 @@ package app.model;
  * @author alumno
  */
 public class Campo {
-    
-    
+     
     private long id;
     private String descripcion;
     private int estado;
@@ -61,11 +60,11 @@ public class Campo {
     public Local getLocal() {
         return local;
     }
-
-    public void setIdLocal(Local Local) {
-        this.local = Local;
+    
+    public void setLocal(Local local) {
+        this.local = local;
     }
-    
-    
+
+ 
     
 }

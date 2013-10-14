@@ -3,49 +3,42 @@ package app.controller.servicio;
 import app.model.Servicio;
 import app.dao.ServiciosDAO;
 import app.dao.ExcepcionDAO;
+import app.model.Local;
 import java.util.Collection;
+import java.util.List;
 
 public class ServicioService {
-    private ServiciosDAO dao=null;
 
+    private ServiciosDAO servicioDAO = null;
 
     public ServicioService() {
-        dao = new ServiciosDAO();
-    }    
-    
-    public Collection<Servicio> buscarPorNombre(String nombre)
-            throws ExcepcionDAO {
-        return dao.listar();
+        servicioDAO = new ServiciosDAO();
     }
 
+    public Collection<Servicio> buscarPorNombre(String nombre)
+            throws ExcepcionDAO {
+        return servicioDAO.list();
+    }
 
     public Servicio insertar(Servicio servicio)
             throws ExcepcionDAO {
-        return dao.insertar(servicio);
+        return servicioDAO.insertar(servicio);
     }
 
-    public Servicio obtener(int idServicio) throws ExcepcionDAO {
-        return dao.obtener(idServicio);
+    public Collection<Servicio> get(Servicio servicio) throws ExcepcionDAO {
+        return servicioDAO.get(servicio);
     }
 
-    public void eliminar(int idServicio) throws ExcepcionDAO {
-        dao.eliminar(idServicio);
+    public void eliminar(Servicio servicio) throws ExcepcionDAO {
+        servicioDAO.eliminar(servicio);
     }
 
     public Servicio actualizar(Servicio servicio)
             throws ExcepcionDAO {
-        return dao.actualizar(servicio);
+        return servicioDAO.actualizar(servicio);
     }
 
-    public static void listar() throws ExcepcionDAO {
-        ServiciosDAO dao = new ServiciosDAO();
-        
-        Collection<Servicio> servicios = dao.listar();
-        
-        for(Servicio servicio : servicios){
-            System.out.println(servicio.getId() 
-                    + " " + servicio.getDescripcion()
-                    + " " + servicio.getCostoHora());
-        }
-    }    
+    public List<Local> list() {
+        return null;
+    }
 }

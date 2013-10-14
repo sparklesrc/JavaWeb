@@ -1,7 +1,6 @@
 package app.dao;
 
-import app.model.Local;
-import app.model.Servicio;
+import app.model.Socio;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,25 +14,31 @@ import java.util.List;
  *
  * @author LAB704-00
  */
-public class ServiciosDAO extends BaseDAO {
+public class SocioDAO extends BaseDAO {
 
-    public Collection<Servicio> buscarPorNombre(String nombre)
+    public Collection<Socio> buscarPorNombre(String pat, String mat)
             throws ExcepcionDAO {
-        String query = "select id, descripcion, costo_hora from servicio where descripcion like ?";
-        Collection<Servicio> lista = new ArrayList<Servicio>();
+        String query = "select id, email, nombres, paterno, materno, celular, sexo, direcion from socio where paterno like ? and materno like ?";
+        Collection<Socio> lista = new ArrayList<Socio>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + nombre + "%");
+            stmt.setString(1, "%" + pat + "%");
+            stmt.setString(2, "%" + mat + "%");
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Servicio item = new Servicio();
+                Socio item = new Socio();
                 item.setId(rs.getInt("id"));
-                item.setDescripcion(rs.getString("descripcion"));
-                item.setCostoHora(rs.getDouble("costo_hora"));
+                item.setEmail(rs.getString("email"));
+                item.setNombres(rs.getString("nombres"));
+                item.setPaterno(rs.getString("paterno"));                
+                item.setMaterno(rs.getString("materno"));                
+                item.setCelular(rs.getString("celular"));
+                item.setSexo(rs.getString("sexo"));
+                item.setDireccion(rs.getString("direccion"));
                 lista.add(item);
             }
         } catch (SQLException e) {
@@ -48,16 +53,21 @@ public class ServiciosDAO extends BaseDAO {
         return lista;
     }
 
-    public Servicio insertar(Servicio servicio) throws ExcepcionDAO {
-        String query = "insert into servicio(descripcion, costo_hora) values (?,?)";
+    public Socio insertar(Socio socio) throws ExcepcionDAO {
+        String query = "insert into socio (email, nombres, paterno, materno, celular, sexo, direccion) values (?,?,?,?,?,?,?)";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, servicio.getDescripcion());
-            stmt.setDouble(2, servicio.getCostoHora());
+            stmt.setString(1, socio.getEmail());
+            stmt.setString(2, socio.getNombres());
+            stmt.setString(3, socio.getPaterno());
+            stmt.setString(4, socio.getMaterno());
+            stmt.setString(5, socio.getCelular());
+            stmt.setString(6, socio.getSexo());
+            stmt.setString(7, socio.getDireccion());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo insertar");
@@ -70,7 +80,7 @@ public class ServiciosDAO extends BaseDAO {
             if (rs.next()) {
                 id = rs.getInt(1);
             }
-            servicio.setId(id);
+            socio.setId(id);
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -80,17 +90,17 @@ public class ServiciosDAO extends BaseDAO {
             this.cerrarStatement(stmt);
             this.cerrarConexion(con);
         }
-        return servicio;
+        return socio;
     }
 
-    public void eliminar(Servicio servicio) throws ExcepcionDAO {
-        String query = "delete from servicio WHERE id=?";
+    public void eliminar(Socio socio) throws ExcepcionDAO {
+        String query = "delete from socio WHERE id=?";
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, (int) servicio.getId());
+            stmt.setInt(1, (int) socio.getId());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo eliminar");
@@ -104,16 +114,21 @@ public class ServiciosDAO extends BaseDAO {
         }
     }
 
-    public Servicio actualizar(Servicio item) throws ExcepcionDAO {
-        String query = "update servicio set descripcion=?, costo_hora=? where id=?";
+    public Socio actualizar(Socio item) throws ExcepcionDAO {
+        String query = "update socio set email=?, nombres=?, paterno=?, materno=?, celular=?, sexo=?, direccion=? where id=?";
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, item.getDescripcion());
-            stmt.setDouble(2, item.getCostoHora());
-            stmt.setLong(3, item.getId());
+            stmt.setString(1, item.getEmail());
+            stmt.setString(2, item.getNombres());
+            stmt.setString(3, item.getPaterno());
+            stmt.setString(4, item.getMaterno());
+            stmt.setString(5, item.getCelular());
+            stmt.setString(6, item.getSexo());
+            stmt.setString(7, item.getDireccion());
+            stmt.setLong(8, item.getId());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo actualizar");
@@ -127,22 +142,27 @@ public class ServiciosDAO extends BaseDAO {
         }
         return item;
     }
-    public List<Servicio> list() throws ExcepcionDAO {
-        List<Servicio> c = new ArrayList<Servicio>();
+    public List<Socio> list() throws ExcepcionDAO {
+        List<Socio> c = new ArrayList<Socio>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
-            String query = "select id,descripcion, costo_hora"
-                    + " from servicio order by id";
+            String query = "select id,email, nombres, paterno, materno, celular, sexo, direccion"
+                    + " from socio order by id";
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Servicio item = new Servicio();
+                Socio item = new Socio();
                 item.setId(rs.getInt("id"));
-                item.setDescripcion(rs.getString("descripcion"));
-                item.setCostoHora(rs.getDouble("costo_hora"));
+                item.setEmail(rs.getString("email"));
+                item.setNombres(rs.getString("nombres"));
+                item.setPaterno(rs.getString("paterno"));
+                item.setMaterno(rs.getString("materno"));
+                item.setCelular(rs.getString("celular"));
+                item.setSexo(rs.getString("sexo"));
+                item.setDireccion(rs.getString("direccion"));
                 c.add(item);
             }
 
@@ -158,23 +178,28 @@ public class ServiciosDAO extends BaseDAO {
     }
 
     /*Busa por ID*/
-    public Collection<Servicio> get(Servicio servicio) throws ExcepcionDAO {
+    public Collection<Socio> get(Socio socio) throws ExcepcionDAO {
 
-        String query = "select id, descripcion, costo_hora from servicio where id like ?";
-        Collection<Servicio> lista = new ArrayList<Servicio>();
+        String query = "select id, email, nombres, paterno, materno, celular, sexo, direccion from socio where id like ?";
+        Collection<Socio> lista = new ArrayList<Socio>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + servicio.getId() + "%");
+            stmt.setString(1, "%" + socio.getId() + "%");
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Servicio item = new Servicio();
+                Socio item = new Socio();
                 item.setId(rs.getInt("id"));
-                item.setDescripcion(rs.getString("descripcion"));
-                item.setCostoHora(rs.getDouble("costo_hora"));
+                item.setEmail(rs.getString("email"));
+                item.setNombres(rs.getString("nombres"));
+                item.setPaterno(rs.getString("paterno"));
+                item.setMaterno(rs.getString("materno"));
+                item.setCelular(rs.getString("celular"));
+                item.setSexo(rs.getString("sexo"));
+                item.setDireccion(rs.getString("direccion"));
                 lista.add(item);
             }
         } catch (SQLException e) {

@@ -4,7 +4,7 @@
  */
 package app.dao;
 
-import app.model.Local;
+import app.model.Administrador;
 import app.zelper.ConexionDB;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author alumno
  */
-public class LocalDAO extends BaseDAO {
+public class AdministradorDAO extends BaseDAO {
 
     /*
      LIST - SELECT
@@ -27,25 +27,22 @@ public class LocalDAO extends BaseDAO {
      UPDATE - UPDATE
      DELETE - DELETE
      */
-    public List<Local> list() throws ExcepcionDAO {
-        List<Local> c = new ArrayList<Local>();
+    public List<Administrador> list() throws ExcepcionDAO {
+        List<Administrador> c = new ArrayList<Administrador>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
-            String query = "select id,direccion,descripcion, estado, maps, telefono"
-                    + " from local order by id";
+            String query = "select id,usuario,password"
+                    + " from general order by id";
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Local item = new Local();
+                Administrador item = new Administrador();
                 item.setId(rs.getInt("id"));
-                item.setDireccion(rs.getString("direccion"));
-                item.setDescripcion(rs.getString("descripcion"));
-                item.setEstado(Integer.parseInt(rs.getString("estado")));
-                item.setMaps(rs.getString("maps"));
-                item.setTelefono(rs.getString("telefono"));
+                item.setUsuario(rs.getString("usuario"));
+                item.setPassword(rs.getString("password"));
                 c.add(item);
             }
 
@@ -61,26 +58,23 @@ public class LocalDAO extends BaseDAO {
     }
 
     /*Busa por ID*/
-    public Collection<Local> get(Local local) throws ExcepcionDAO {
+    public Collection<Administrador> get(Administrador administrador) throws ExcepcionDAO {
 
-        String query = "select id, direccion, descripcion, estado, maps, telefono from local where id like ?";
-        Collection<Local> lista = new ArrayList<Local>();
+        String query = "select id, usuario, password from administrador where id like ?";
+        Collection<Administrador> lista = new ArrayList<Administrador>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + local.getId() + "%");
+            stmt.setString(1, "%" + administrador.getId() + "%");
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Local item = new Local();
+                Administrador item = new Administrador();
                 item.setId(rs.getInt("id"));
-                item.setDescripcion(rs.getString("descripcion"));
-                item.setDireccion(rs.getString("direccion"));
-                item.setEstado(Integer.parseInt(rs.getString("estado")));
-                item.setMaps(rs.getString("maps"));
-                item.setTelefono(rs.getString("telefono"));
+                item.setUsuario(rs.getString("usuario"));
+                item.setPassword(rs.getString("password"));
                 lista.add(item);
             }
         } catch (SQLException e) {
@@ -96,21 +90,18 @@ public class LocalDAO extends BaseDAO {
 
     }
 
-    /*Inserta Local*/
-    public Local insertar(Local local) throws ExcepcionDAO {
-        String query = "insert into local(direccion, descripcion,"
-                + "estado, maps, telefono) values (?,?,?,?,?)";
+    /*Inserta Administrador*/
+    public Administrador insertar(Administrador administrador) throws ExcepcionDAO {
+        String query = "insert into administrador(usuario, password)"
+                + " values (?,?)";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, local.getDireccion());
-            stmt.setString(2, local.getDescripcion());
-            stmt.setInt(2, local.getEstado());
-            stmt.setString(2, local.getMaps());
-            stmt.setString(2, local.getTelefono());
+            stmt.setString(1, administrador.getUsuario());
+            stmt.setString(2, administrador.getPassword());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo insertar");
@@ -123,7 +114,7 @@ public class LocalDAO extends BaseDAO {
             if (rs.next()) {
                 id = rs.getInt(1);
             }
-            local.setId(id);
+            administrador.setId(id);
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -133,24 +124,21 @@ public class LocalDAO extends BaseDAO {
             this.cerrarStatement(stmt);
             this.cerrarConexion(con);
         }
-        return local;
+        return administrador;
     }
 
-    /*Update Local*/
-    public Local actualizar(Local item) throws ExcepcionDAO {
-        String query = "update local set direccion=?,descripcion=?, estado=?, maps=?, telefono=?"
+    /*Update Administrador*/
+    public Administrador actualizar(Administrador item) throws ExcepcionDAO {
+        String query = "update administrador set usuario=?,password=?"
                 + " where id=?";
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, item.getDireccion());
-            stmt.setString(2, item.getDescripcion());
-            stmt.setInt(3, item.getEstado());
-            stmt.setString(4, item.getMaps());
-            stmt.setString(5, item.getTelefono());
-            stmt.setLong(6, item.getId());            
+            stmt.setString(1, item.getUsuario());
+            stmt.setString(2, item.getPassword());
+            stmt.setLong(3, item.getId());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo actualizar");
@@ -165,15 +153,15 @@ public class LocalDAO extends BaseDAO {
         return item;
     }
 
-    /*Delete Local*/
-    public void eliminar(Local local) throws ExcepcionDAO {
-        String query = "delete from local WHERE id=?";
+    /*Delete Administrador*/
+    public void eliminar(Administrador administrador) throws ExcepcionDAO {
+        String query = "delete from administrador WHERE id=?";
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, (int) local.getId());
+            stmt.setInt(1, (int) administrador.getId());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo eliminar");

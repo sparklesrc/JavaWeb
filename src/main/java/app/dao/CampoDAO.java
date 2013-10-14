@@ -1,7 +1,6 @@
 package app.dao;
 
-import app.model.Local;
-import app.model.Servicio;
+import app.model.Campo;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,25 +14,28 @@ import java.util.List;
  *
  * @author LAB704-00
  */
-public class ServiciosDAO extends BaseDAO {
+public class CampoDAO extends BaseDAO {
 
-    public Collection<Servicio> buscarPorNombre(String nombre)
+    public Collection<Campo> buscarPorNombre(String descripcion)
             throws ExcepcionDAO {
-        String query = "select id, descripcion, costo_hora from servicio where descripcion like ?";
-        Collection<Servicio> lista = new ArrayList<Servicio>();
+        String query = "select id, descripcion, estado, tipo, costo_hora, id_local from campo where descripcion like ?";
+        Collection<Campo> lista = new ArrayList<Campo>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + nombre + "%");
+            stmt.setString(1, "%" + descripcion + "%");
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Servicio item = new Servicio();
+                Campo item = new Campo();
                 item.setId(rs.getInt("id"));
                 item.setDescripcion(rs.getString("descripcion"));
-                item.setCostoHora(rs.getDouble("costo_hora"));
+                item.setEstado(rs.getInt("estado"));
+                item.setTipo(rs.getInt("tipo"));
+                item.setCosto_hora(rs.getDouble("costo_hora"));
+                item.setLocal();
                 lista.add(item);
             }
         } catch (SQLException e) {
@@ -48,16 +50,19 @@ public class ServiciosDAO extends BaseDAO {
         return lista;
     }
 
-    public Servicio insertar(Servicio servicio) throws ExcepcionDAO {
-        String query = "insert into servicio(descripcion, costo_hora) values (?,?)";
+    public Campo insertar(Campo campo) throws ExcepcionDAO {
+        String query = "insert into campo(descripcion, estado, tipo, costo_hora, id_local) values (?,?)";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, servicio.getDescripcion());
-            stmt.setDouble(2, servicio.getCostoHora());
+            stmt.setString(1, campo.getDescripcion());
+            stmt.setInt(2, campo.getEstado());
+            stmt.setInt(3, campo.getTipo());            
+            stmt.setDouble(4, campo.getCostoHora());
+            stmt.setObject(5, campo.getLocal().getId());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo insertar");
@@ -70,7 +75,7 @@ public class ServiciosDAO extends BaseDAO {
             if (rs.next()) {
                 id = rs.getInt(1);
             }
-            servicio.setId(id);
+            campo.setId(id);
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -80,17 +85,17 @@ public class ServiciosDAO extends BaseDAO {
             this.cerrarStatement(stmt);
             this.cerrarConexion(con);
         }
-        return servicio;
+        return campo;
     }
 
-    public void eliminar(Servicio servicio) throws ExcepcionDAO {
-        String query = "delete from servicio WHERE id=?";
+    public void eliminar(Campo campo) throws ExcepcionDAO {
+        String query = "delete from campo WHERE id=?";
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, (int) servicio.getId());
+            stmt.setInt(1, (int) campo.getId());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo eliminar");
@@ -104,16 +109,19 @@ public class ServiciosDAO extends BaseDAO {
         }
     }
 
-    public Servicio actualizar(Servicio item) throws ExcepcionDAO {
-        String query = "update servicio set descripcion=?, costo_hora=? where id=?";
+    public Campo actualizar(Campo item) throws ExcepcionDAO {
+        String query = "update campo set descripcion=?, estado=?, tipo=?, costo_hora=?, id_local=? where id=?";
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
             stmt.setString(1, item.getDescripcion());
-            stmt.setDouble(2, item.getCostoHora());
-            stmt.setLong(3, item.getId());
+            stmt.setInt(2, item.getEstado());
+            stmt.setInt(3, item.getTipo());
+            stmt.setDouble(4, item.getCostoHora());
+            stmt.setDouble(5, item.getLocal().getId());
+            stmt.setLong(6, item.getId());            
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo actualizar");
@@ -127,22 +135,25 @@ public class ServiciosDAO extends BaseDAO {
         }
         return item;
     }
-    public List<Servicio> list() throws ExcepcionDAO {
-        List<Servicio> c = new ArrayList<Servicio>();
+    public List<Campo> list() throws ExcepcionDAO {
+        List<Campo> c = new ArrayList<Campo>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
-            String query = "select id,descripcion, costo_hora"
-                    + " from servicio order by id";
+            String query = "select id,descripcion, estado, tipo, costo_hora, id_local "
+                    + " from campo order by id";
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Servicio item = new Servicio();
+                Campo item = new Campo();
                 item.setId(rs.getInt("id"));
                 item.setDescripcion(rs.getString("descripcion"));
-                item.setCostoHora(rs.getDouble("costo_hora"));
+                item.setEstado(rs.getInt("estado"));
+                item.setTipo(rs.getInt("tipo"));                
+                item.setCosto_hora(rs.getDouble("costo_hora"));
+                item.setLocal();
                 c.add(item);
             }
 
@@ -158,23 +169,26 @@ public class ServiciosDAO extends BaseDAO {
     }
 
     /*Busa por ID*/
-    public Collection<Servicio> get(Servicio servicio) throws ExcepcionDAO {
+    public Collection<Campo> get(Campo campo) throws ExcepcionDAO {
 
-        String query = "select id, descripcion, costo_hora from servicio where id like ?";
-        Collection<Servicio> lista = new ArrayList<Servicio>();
+        String query = "select id, descripcion, estado, tipo, costo_hora, id_local from campo where id like ?";
+        Collection<Campo> lista = new ArrayList<Campo>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + servicio.getId() + "%");
+            stmt.setString(1, "%" + campo.getId() + "%");
             rs = stmt.executeQuery();
             while (rs.next()) {
-                Servicio item = new Servicio();
+                Campo item = new Campo();
                 item.setId(rs.getInt("id"));
                 item.setDescripcion(rs.getString("descripcion"));
-                item.setCostoHora(rs.getDouble("costo_hora"));
+                item.setEstado(rs.getInt("estado"));
+                item.setTipo(rs.getInt("tipo"));
+                item.setCosto_hora(rs.getDouble("costo_hora"));
+                item.setLocal();
                 lista.add(item);
             }
         } catch (SQLException e) {
