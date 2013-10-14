@@ -11,11 +11,12 @@ public class SolicitudAlquiler {
     private long id;
     private String horaInicio;
     private String horaFin;
-    private Date dia;
+    private int dia;
     private String servicios;
     private int estado;
     private Socio socio;
     private Campo campo;
+
 
     public long getId() {
         return id;
@@ -41,11 +42,11 @@ public class SolicitudAlquiler {
         this.horaFin = horaFin;
     }
 
-    public Date getDia() {
+    public int getDia() {
         return dia;
     }
 
-    public void setDia(Date dia) {
+    public void setDia(int dia) {
         this.dia = dia;
     }
 
@@ -69,7 +70,7 @@ public class SolicitudAlquiler {
         return socio;
     }
 
-    public void setIdSocio(Socio socio) {
+    public void setSocio(Socio socio) {
         this.socio = socio;
     }
 
@@ -77,11 +78,7 @@ public class SolicitudAlquiler {
         return campo;
     }
 
-    public void setIdCampo(Campo campo) {
+    public void setCampo(Campo campo) {
         this.campo = campo;
-    }
-    
-    
-    
-    
+    }    
 }
