@@ -16,34 +16,30 @@ import java.util.List;
  */
 public class LocalService {
     
-    
     private LocalDAO localDAO = null;
     
     public LocalService(){
-        localDAO=new LocalDAO();
+        localDAO = new LocalDAO();
     }
     
-    
-    public List<Local> list(){
-    return null;
+    public List<Local> list() {
+        return localDAO.list();
     }
-   
-    public Collection<Local> get(Local local) throws ExcepcionDAO{
-    return localDAO.get(local);
+
+    public Local get(Local local) {
+        return localDAO.get(local);
     }
-    
-    public Local save(Local local) throws ExcepcionDAO{
-        return localDAO.insertar(local);
-    }
-    
-    public Local update(Local local) throws ExcepcionDAO{
-        return localDAO.actualizar(local);
+
+    public Local save(Local local) {
+        return localDAO.save(local);
     }
     
-    public void delete(Local local) throws ExcepcionDAO{
-        localDAO.eliminar(local);
+    public Local update(Local local) {
+        return localDAO.update(local);
     }
     
-    
+    public void delete(Local local) {
+        localDAO.delete(local);
+    }
     
 }

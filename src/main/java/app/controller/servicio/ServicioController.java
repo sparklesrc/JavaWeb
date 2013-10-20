@@ -20,12 +20,13 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/adm/servicio")
 public class ServicioController extends HttpServlet {
 
+
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //Cuando se ingrese en la url la direccion /adm/local
-        //vendra aqui y esto devolvera al cliente la pagina local.jsp
-        RequestDispatcher rd = req.getRequestDispatcher("/WEB-INF/adm/local/servicio.jsp");
-        rd.forward(req, resp);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
+            
+        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/adm/servicio/servicio.jsp");
+        rd.forward(request, response);
         
     }
 

@@ -17,18 +17,18 @@ import java.util.List;
  */
 public class ServiciosDAO extends BaseDAO {
 
-    public Collection<Servicio> buscarPorNombre(String nombre)
-            throws ExcepcionDAO {
-        String query = "select id, descripcion, costo_hora from servicio where descripcion like ?";
-        Collection<Servicio> lista = new ArrayList<Servicio>();
+    public List<Servicio> list() throws ExcepcionDAO {
+        List<Servicio> lista = new ArrayList<Servicio>();
+
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
+            String query = "select * from servicio order;";
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + nombre + "%");
             rs = stmt.executeQuery();
+
             while (rs.next()) {
                 Servicio item = new Servicio();
                 item.setId(rs.getInt("id"));
@@ -36,33 +36,61 @@ public class ServiciosDAO extends BaseDAO {
                 item.setCostoHora(rs.getDouble("costo_hora"));
                 lista.add(item);
             }
+
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
         } finally {
             this.cerrarResultSet(rs);
             this.cerrarStatement(stmt);
             this.cerrarConexion(con);
         }
-        System.out.println(lista.size());
         return lista;
     }
 
-    public Servicio insertar(Servicio servicio) throws ExcepcionDAO {
-        String query = "insert into servicio(descripcion, costo_hora) values (?,?)";
+    public Servicio get(Servicio servicio)
+            throws ExcepcionDAO {
+        String query = "select * from servicio where id = ?";
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+       Servicio servicioOriginal = new Servicio();
+        try {
+            con = ConexionDB.obtenerConexion();
+            stmt = con.prepareStatement(query);
+            stmt.setLong(1,servicio.getId());
+            rs = stmt.executeQuery();
+                
+            
+            while (rs.next()) {
+                servicioOriginal.setId(rs.getInt("id"));
+                servicioOriginal.setDescripcion(rs.getString("descripcion"));
+                servicioOriginal.setCostoHora(rs.getDouble("costo_hora"));
+            }
+        } catch (SQLException e) {
+              System.err.println(e.getMessage());
+        } finally {
+            this.cerrarResultSet(rs);
+            this.cerrarStatement(stmt);
+            this.cerrarConexion(con);
+        }
+        return servicioOriginal;
+    }
+
+    public Servicio save(Servicio servicio) throws ExcepcionDAO {
+        String query = "insert into servicio(descripcion,costo_hora) values (?,?)";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
+
             stmt.setString(1, servicio.getDescripcion());
             stmt.setDouble(2, servicio.getCostoHora());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo insertar");
             }
-            // Obtener el ultimo id
             int id = 0;
             query = "select last_insert_id()";
             stmt = con.prepareStatement(query);
@@ -74,7 +102,6 @@ public class ServiciosDAO extends BaseDAO {
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
         } finally {
             this.cerrarResultSet(rs);
             this.cerrarStatement(stmt);
@@ -82,111 +109,50 @@ public class ServiciosDAO extends BaseDAO {
         }
         return servicio;
     }
-
-    public void eliminar(Servicio servicio) throws ExcepcionDAO {
-        String query = "delete from servicio WHERE id=?";
+    
+     public Servicio update(Servicio servicio) throws ExcepcionDAO {
+        String query = "update servicio descripcion=?,costo_hora=? where id=?";
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, (int) servicio.getId());
-            int i = stmt.executeUpdate();
-            if (i != 1) {
-                throw new SQLException("No se pudo eliminar");
-            }
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
-        } finally {
-            this.cerrarStatement(stmt);
-            this.cerrarConexion(con);
-        }
-    }
-
-    public Servicio actualizar(Servicio item) throws ExcepcionDAO {
-        String query = "update servicio set descripcion=?, costo_hora=? where id=?";
-        Connection con = null;
-        PreparedStatement stmt = null;
-        try {
-            con = ConexionDB.obtenerConexion();
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, item.getDescripcion());
-            stmt.setDouble(2, item.getCostoHora());
-            stmt.setLong(3, item.getId());
+             stmt.setString(1, servicio.getDescripcion());
+            stmt.setDouble(2, servicio.getCostoHora());
+            stmt.setLong(3, servicio.getId());
+            
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo actualizar");
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
         } finally {
             this.cerrarStatement(stmt);
             this.cerrarConexion(con);
         }
-        return item;
-    }
-    public List<Servicio> list() throws ExcepcionDAO {
-        List<Servicio> c = new ArrayList<Servicio>();
-        Connection con = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        try {
-            con = ConexionDB.obtenerConexion();
-            String query = "select id,descripcion, costo_hora"
-                    + " from servicio order by id";
-            stmt = con.prepareStatement(query);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                Servicio item = new Servicio();
-                item.setId(rs.getInt("id"));
-                item.setDescripcion(rs.getString("descripcion"));
-                item.setCostoHora(rs.getDouble("costo_hora"));
-                c.add(item);
-            }
-
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
-        } finally {
-            this.cerrarResultSet(rs);
-            this.cerrarStatement(stmt);
-            this.cerrarConexion(con);
-        }
-        return c;
+        return servicio;
     }
 
-    /*Busa por ID*/
-    public Collection<Servicio> get(Servicio servicio) throws ExcepcionDAO {
-
-        String query = "select id, descripcion, costo_hora from servicio where id like ?";
-        Collection<Servicio> lista = new ArrayList<Servicio>();
+    public void delete(Servicio servicio) throws ExcepcionDAO {
+        String query = "delete from servicio WHERE id=?";
         Connection con = null;
         PreparedStatement stmt = null;
-        ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + servicio.getId() + "%");
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                Servicio item = new Servicio();
-                item.setId(rs.getInt("id"));
-                item.setDescripcion(rs.getString("descripcion"));
-                item.setCostoHora(rs.getDouble("costo_hora"));
-                lista.add(item);
+            stmt.setLong(1, servicio.getId());
+            int i = stmt.executeUpdate();
+            if (i != 1) {
+                throw new SQLException("No se pudo eliminar");
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
         } finally {
-            this.cerrarResultSet(rs);
             this.cerrarStatement(stmt);
             this.cerrarConexion(con);
         }
-        System.out.println(lista.size());
-        return lista;
     }
 
+   
 }

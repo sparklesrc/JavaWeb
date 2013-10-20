@@ -8,37 +8,32 @@ import java.util.Collection;
 import java.util.List;
 
 public class ServicioService {
-
+    
     private ServiciosDAO servicioDAO = null;
-
-    public ServicioService() {
-        servicioDAO = new ServiciosDAO();
+    
+    public ServicioService(){
+      servicioDAO = new ServiciosDAO();
     }
 
-    public Collection<Servicio> buscarPorNombre(String nombre)
-            throws ExcepcionDAO {
+    
+    public List<Servicio> list() throws ExcepcionDAO {
         return servicioDAO.list();
     }
 
-    public Servicio insertar(Servicio servicio)
-            throws ExcepcionDAO {
-        return servicioDAO.insertar(servicio);
-    }
-
-    public Collection<Servicio> get(Servicio servicio) throws ExcepcionDAO {
+    public Servicio get(Servicio servicio) throws ExcepcionDAO {
         return servicioDAO.get(servicio);
     }
 
-    public void eliminar(Servicio servicio) throws ExcepcionDAO {
-        servicioDAO.eliminar(servicio);
+    public Servicio save(Servicio servicio) throws ExcepcionDAO {
+        return servicioDAO.save(servicio);
     }
-
-    public Servicio actualizar(Servicio servicio)
-            throws ExcepcionDAO {
-        return servicioDAO.actualizar(servicio);
+    
+    public Servicio update(Servicio servicio) throws ExcepcionDAO {
+        return servicioDAO.update(servicio);
     }
-
-    public List<Local> list() {
-        return null;
+    
+    public void delete(Servicio servicio) throws ExcepcionDAO {
+         servicioDAO.delete(servicio);
     }
+    
 }

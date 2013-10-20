@@ -8,6 +8,7 @@ import app.controller.campo.*;
 import app.dao.ExcepcionDAO;
 import app.dao.CampoDAO;
 import app.model.Campo;
+import app.model.Local;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,34 +18,30 @@ import java.util.List;
  */
 public class CampoService {
     
-    
-    private CampoDAO campoDAO = null;
+    private CampoDAO campoDao = null;
     
     public CampoService(){
-        campoDAO=new CampoDAO();
+        campoDao = new CampoDAO();
     }
     
-    
-    public List<Campo> list(){
-    return null;
+    public List<Local> list() {
+        return campoDao.list();
     }
-   
-    public Collection<Campo> get(Campo campo) throws ExcepcionDAO{
-    return campoDAO.get(campo);
+
+    public Campo get(Campo campo) {
+        return campoDao.get(campo);
     }
-    
-    public Campo save(Campo campo) throws ExcepcionDAO{
-        return campoDAO.insertar(campo);
-    }
-    
-    public Campo update(Campo campo) throws ExcepcionDAO{
-        return campoDAO.actualizar(campo);
+
+    public Campo save(Campo campo) {
+        return campoDao.save(campo);
     }
     
-    public void delete(Campo campo) throws ExcepcionDAO{
-        campoDAO.eliminar(campo);
+    public Campo update(Campo campo) {
+        return campoDao.update(campo);
     }
     
-    
+    public void delete(Campo campo) {
+        campoDao.delete(campo);
+    }
     
 }

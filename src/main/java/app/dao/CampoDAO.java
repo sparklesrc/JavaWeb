@@ -15,62 +15,81 @@ import java.util.List;
  *
  * @author LAB704-00
  */
-public class CampoDAO extends BaseDAO {
+public class CampoDAO extends BaseDAO{
+    
+     public List<Local> list(){
+        List<Local> lista = new ArrayList<Local>();
 
-    public Collection<Campo> buscarPorNombre(String descripcion)
-            throws ExcepcionDAO {
-        String query = "select id, descripcion, estado, tipo, costo_hora, id_local from campo where descripcion like ?";
-        Collection<Campo> lista = new ArrayList<Campo>();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
+            String query = "select * from local order by descripcion;";
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + descripcion + "%");
             rs = stmt.executeQuery();
+
             while (rs.next()) {
-                Campo item = new Campo();
-                Local local = new Local();
+                Local item = new Local();
                 item.setId(rs.getInt("id"));
                 item.setDescripcion(rs.getString("descripcion"));
                 item.setEstado(rs.getInt("estado"));
-                item.setTipo(rs.getInt("tipo"));
-                item.setCosto_hora(rs.getDouble("costo_hora"));
-                local.setId(rs.getInt("id_local"));
-                item.setLocal(local);
                 lista.add(item);
             }
+
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
         } finally {
             this.cerrarResultSet(rs);
             this.cerrarStatement(stmt);
             this.cerrarConexion(con);
         }
-        System.out.println(lista.size());
         return lista;
     }
 
-    public Campo insertar(Campo campo) throws ExcepcionDAO {
-        String query = "insert into campo(descripcion, estado, tipo, costo_hora, id_local) values (?,?)";
+    public Campo get(Campo campo) {
+        String query = "select * from campo where id = ?";
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Campo item = new Campo();
+        try {
+            con = ConexionDB.obtenerConexion();
+            stmt = con.prepareStatement(query);
+            stmt.setLong(1, campo.getId());
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                item.setId(rs.getInt("id"));
+                item.setDescripcion(rs.getString("descripcion"));
+                item.setEstado(rs.getInt("estado"));
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            this.cerrarResultSet(rs);
+            this.cerrarStatement(stmt);
+            this.cerrarConexion(con);
+        }
+        return item;
+    }
+
+    public Campo save(Campo campo) {
+        String query = "insert into campo(descripcion,estado,maps,telefono) values (?,?)";
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, campo.getDescripcion());
-            stmt.setInt(2, campo.getEstado());
-            stmt.setInt(3, campo.getTipo());            
-            stmt.setDouble(4, campo.getCostoHora());
-            stmt.setLong(5, campo.getLocal().getId());
+
+            stmt.setString(2, campo.getDescripcion());
+            stmt.setInt(3, campo.getEstado());
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo insertar");
             }
-            // Obtener el ultimo id
             int id = 0;
             query = "select last_insert_id()";
             stmt = con.prepareStatement(query);
@@ -82,7 +101,6 @@ public class CampoDAO extends BaseDAO {
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
         } finally {
             this.cerrarResultSet(rs);
             this.cerrarStatement(stmt);
@@ -91,123 +109,47 @@ public class CampoDAO extends BaseDAO {
         return campo;
     }
 
-    public void eliminar(Campo campo) throws ExcepcionDAO {
-        String query = "delete from campo WHERE id=?";
+    public Campo update(Campo campo) {
+        String query = "update campo set descripcion=?,estado=? where id=?";
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, (int) campo.getId());
-            int i = stmt.executeUpdate();
-            if (i != 1) {
-                throw new SQLException("No se pudo eliminar");
-            }
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
-        } finally {
-            this.cerrarStatement(stmt);
-            this.cerrarConexion(con);
-        }
-    }
+            stmt.setString(2, campo.getDescripcion());
+            stmt.setInt(3, campo.getEstado());
+            stmt.setLong(6, campo.getId());
 
-    public Campo actualizar(Campo item) throws ExcepcionDAO {
-        String query = "update campo set descripcion=?, estado=?, tipo=?, costo_hora=?, id_local=? where id=?";
-        Connection con = null;
-        PreparedStatement stmt = null;
-        try {
-            con = ConexionDB.obtenerConexion();
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, item.getDescripcion());
-            stmt.setInt(2, item.getEstado());
-            stmt.setInt(3, item.getTipo());
-            stmt.setDouble(4, item.getCostoHora());
-            stmt.setLong(5, item.getLocal().getId());
-            stmt.setLong(6, item.getId());            
             int i = stmt.executeUpdate();
             if (i != 1) {
                 throw new SQLException("No se pudo actualizar");
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
         } finally {
             this.cerrarStatement(stmt);
             this.cerrarConexion(con);
         }
-        return item;
-    }
-    public List<Campo> list() throws ExcepcionDAO {
-        List<Campo> c = new ArrayList<Campo>();
-        Connection con = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        try {
-            con = ConexionDB.obtenerConexion();
-            String query = "select id,descripcion, estado, tipo, costo_hora, id_local "
-                    + " from campo order by id";
-            stmt = con.prepareStatement(query);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                Campo item = new Campo();
-                Local local = new Local();
-                item.setId(rs.getInt("id"));
-                item.setDescripcion(rs.getString("descripcion"));
-                item.setEstado(rs.getInt("estado"));
-                item.setTipo(rs.getInt("tipo"));                
-                item.setCosto_hora(rs.getDouble("costo_hora"));
-                local.setId(rs.getInt("id_local"));
-                item.setLocal(local);
-                c.add(item);
-            }
-
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
-        } finally {
-            this.cerrarResultSet(rs);
-            this.cerrarStatement(stmt);
-            this.cerrarConexion(con);
-        }
-        return c;
+        return campo;
     }
 
-    /*Busa por ID*/
-    public Collection<Campo> get(Campo campo) throws ExcepcionDAO {
-
-        String query = "select id, descripcion, estado, tipo, costo_hora, id_local from campo where id like ?";
-        Collection<Campo> lista = new ArrayList<Campo>();
+    public void delete(Campo campo) {
+        String query = "delete from campo WHERE id=?";
         Connection con = null;
         PreparedStatement stmt = null;
-        ResultSet rs = null;
         try {
             con = ConexionDB.obtenerConexion();
             stmt = con.prepareStatement(query);
-            stmt.setString(1, "%" + campo.getId() + "%");
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                Campo item = new Campo();
-                Local local = new Local();
-                item.setId(rs.getInt("id"));
-                item.setDescripcion(rs.getString("descripcion"));
-                item.setEstado(rs.getInt("estado"));
-                item.setTipo(rs.getInt("tipo"));
-                item.setCosto_hora(rs.getDouble("costo_hora"));
-                local.setId(rs.getInt("id_local"));
-                item.setLocal(local);
-                lista.add(item);
+            stmt.setLong(1, campo.getId());
+            int i = stmt.executeUpdate();
+            if (i != 1) {
+                throw new SQLException("No se pudo eliminar");
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-            throw new ExcepcionDAO(e.getMessage());
         } finally {
-            this.cerrarResultSet(rs);
             this.cerrarStatement(stmt);
             this.cerrarConexion(con);
         }
-        System.out.println(lista.size());
-        return lista;
     }
-
 }

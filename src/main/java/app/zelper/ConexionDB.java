@@ -11,7 +11,7 @@ public class ConexionDB {
         Connection con = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost/tallerweb",
+            con = DriverManager.getConnection("jdbc:mysql://localhost/javaweb",
                     "root", "mysql");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
